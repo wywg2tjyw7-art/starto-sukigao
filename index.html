@@ -183,6 +183,25 @@ h1 span{color:#d46fa8}
   .result-card.rank-1 .result-name { font-size: 19px; }
 }
 
+
+.back-wrap {
+  text-align: center;
+  margin: 10px 0 8px;
+}
+#backBtn {
+  border: 0;
+  background: rgba(255,255,255,.72);
+  color: #b75b91;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 9px 15px;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(100,60,90,.08);
+}
+#backBtn:disabled {
+  opacity: .35;
+}
+
 </style>
 </head>
 <body>
@@ -204,6 +223,8 @@ h1 span{color:#d46fa8}
 <button id="rightBtn" class="choice" type="button">右の人が好き →</button>
 <button id="bothBtn" class="choice" type="button">♡ どっちも好き</button>
 <button id="noneBtn" class="choice" type="button">△ どっちもタイプじゃない</button>
+<div class="back-wrap"><button id="backBtn" type="button">← 1つ前に戻る</button></div>
+
 </div>
 </section>
 
@@ -226,11 +247,12 @@ h1 span{color:#d46fa8}
 const members=[["坂本昌行", "20th Century"], ["長野博", "20th Century"], ["井ノ原快彦", "20th Century"], ["増田貴久", "NEWS"], ["小山慶一郎", "NEWS"], ["加藤シゲアキ", "NEWS"], ["横山裕", "SUPER EIGHT"], ["村上信五", "SUPER EIGHT"], ["丸山隆平", "SUPER EIGHT"], ["安田章大", "SUPER EIGHT"], ["大倉忠義", "SUPER EIGHT"], ["山田涼介", "Hey! Say! JUMP"], ["知念侑李", "Hey! Say! JUMP"], ["有岡大貴", "Hey! Say! JUMP"], ["伊野尾慧", "Hey! Say! JUMP"], ["八乙女光", "Hey! Say! JUMP"], ["薮宏太", "Hey! Say! JUMP"], ["髙木雄也", "Hey! Say! JUMP"], ["千賀健永", "Kis-My-Ft2"], ["宮田俊哉", "Kis-My-Ft2"], ["横尾渉", "Kis-My-Ft2"], ["藤ヶ谷太輔", "Kis-My-Ft2"], ["玉森裕太", "Kis-My-Ft2"], ["二階堂高嗣", "Kis-My-Ft2"], ["佐藤勝利", "timelesz"], ["菊池風磨", "timelesz"], ["松島聡", "timelesz"], ["寺西拓人", "timelesz"], ["原嘉孝", "timelesz"], ["橋本将生", "timelesz"], ["猪俣周杜", "timelesz"], ["篠塚大輝", "timelesz"], ["橋本良亮", "A.B.C-Z"], ["戸塚祥太", "A.B.C-Z"], ["五関晃一", "A.B.C-Z"], ["塚田僚一", "A.B.C-Z"], ["重岡大毅", "WEST."], ["桐山照史", "WEST."], ["中間淳太", "WEST."], ["神山智洋", "WEST."], ["藤井流星", "WEST."], ["濵田崇裕", "WEST."], ["小瀧望", "WEST."], ["髙地優吾", "SixTONES"], ["京本大我", "SixTONES"], ["田中樹", "SixTONES"], ["松村北斗", "SixTONES"], ["ジェシー", "SixTONES"], ["森本慎太郎", "SixTONES"], ["岩本照", "Snow Man"], ["深澤辰哉", "Snow Man"], ["渡辺翔太", "Snow Man"], ["阿部亮平", "Snow Man"], ["佐久間大介", "Snow Man"], ["宮舘涼太", "Snow Man"], ["向井康二", "Snow Man"], ["目黒蓮", "Snow Man"], ["ラウール", "Snow Man"], ["藤原丈一郎", "なにわ男子"], ["西畑大吾", "なにわ男子"], ["大西流星", "なにわ男子"], ["道枝駿佑", "なにわ男子"], ["高橋恭平", "なにわ男子"], ["長尾謙杜", "なにわ男子"], ["大橋和也", "なにわ男子"], ["宮近海斗", "Travis Japan"], ["中村海人", "Travis Japan"], ["七五三掛龍也", "Travis Japan"], ["川島如恵留", "Travis Japan"], ["吉澤閑也", "Travis Japan"], ["松田元太", "Travis Japan"], ["松倉海斗", "Travis Japan"], ["正門良規", "Aぇ! group"], ["末澤誠也", "Aぇ! group"], ["小島健", "Aぇ! group"], ["佐野晶哉", "Aぇ! group"], ["永瀬廉", "King & Prince"], ["髙橋海人", "King & Prince"]];
 const TOTAL=members.length;
 const MIN_SEEN=2;
-const scores=new Array(TOTAL).fill(0);
-const seen=new Array(TOTAL).fill(0);
-const history=[];
+let scores=new Array(TOTAL).fill(0);
+let seen=new Array(TOTAL).fill(0);
+let history=[];
 let a=-1,b=-1,locked=false;
 let phase="coverage";
+let snapshots=[];
 
 function shuffle(arr){
   return arr.slice().sort(()=>Math.random()-0.5);
@@ -278,6 +300,21 @@ function competitivePair(){
   return [x,y];
 }
 
+function saveSnapshot(){
+  snapshots.push({
+    scores:scores.slice(),
+    seen:seen.slice(),
+    history:history.slice(),
+    phase:phase,
+    a:a,b:b
+  });
+}
+
+function updateBackButton(){
+  const btn=document.getElementById("backBtn");
+  if(btn) btn.disabled=snapshots.length===0;
+}
+
 function nextPair(){
   const pair=phase==="coverage" ? coveragePair() : competitivePair();
   a=pair[0]; b=pair[1];
@@ -314,28 +351,50 @@ function draw(){
       "ここからは上位候補をじっくり比較♡";
     document.getElementById("bar").style.width=Math.min(95,60+history.length/2)+"%";
   }
+
+  updateBackButton();
 }
 
 function vote(type){
   if(locked)return;
+
+  // Save the current question and score state so it can be undone.
+  snapshots.push({
+    scores:scores.slice(),
+    seen:seen.slice(),
+    history:history.slice(),
+    phase:phase,
+    a:a,b:b
+  });
+
   locked=true;
   if(type==="left") scores[a]+=3;
   if(type==="right") scores[b]+=3;
   if(type==="both"){ scores[a]+=2; scores[b]+=2; }
-  // "none" gives neither person a boost.
 
   const allCovered=seen.every(x=>x>=MIN_SEEN);
-  if(allCovered && phase==="coverage"){
-    phase="competitive";
-  }
+  if(allCovered && phase==="coverage") phase="competitive";
 
-  // Finish once coverage is complete and there has been enough
-  // competitive comparison to stabilize the top 9.
   if(phase==="competitive" && history.length>=140){
     showResult();
   }else{
     nextPair();
   }
+}
+
+function goBack(){
+  if(snapshots.length===0)return;
+  const s=snapshots.pop();
+  scores=s.scores;
+  seen=s.seen;
+  history=s.history;
+  phase=s.phase;
+  a=s.a; b=s.b;
+  locked=false;
+  document.getElementById("game").style.display="block";
+  document.getElementById("result").style.display="none";
+  draw();
+  updateBackButton();
 }
 
 function showResult(){
@@ -365,7 +424,9 @@ document.getElementById("noneBtn").onclick=()=>vote("none");
 document.getElementById("left").onclick=()=>vote("left");
 document.getElementById("right").onclick=()=>vote("right");
 document.getElementById("restart").onclick=()=>location.reload();
+document.getElementById("backBtn").onclick=goBack;
 nextPair();
+updateBackButton();
 })();
 </script>
 </body>
