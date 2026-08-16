@@ -52,7 +52,7 @@ h1 span{color:#d46fa8}
 <div class="header">
 <span class="badge">STARTO ENTERTAINMENT</span>
 <h1>好き顔<span>♡</span>9選</h1>
-<p class="lead">デビュー組から、直感で好き顔を選ぼう！</p>
+<p class="lead">デビュー組全員を比較して、あなたの好き顔TOP9を決めよう！</p>
 </div>
 <div class="progress"><div id="bar" class="bar"></div></div>
 <p id="counter" class="counter">1 / 35 回</p>
@@ -72,7 +72,7 @@ h1 span{color:#d46fa8}
 <div class="header">
 <span class="badge">RESULT</span>
 <h1>あなたの<br><span>好き顔ランキング</span> ♡</h1>
-<p class="lead">選択結果から9人を選んだよ！</p>
+<p class="lead">全員をしっかり比較した、あなたの好き顔TOP9♡</p>
 </div>
 <div id="ranking" class="ranking"></div>
 <button id="restart" class="restart" type="button">もう一回あそぶ ♡</button>
@@ -83,81 +83,147 @@ h1 span{color:#d46fa8}
 (function(){
 "use strict";
 const members=[["坂本昌行", "20th Century"], ["長野博", "20th Century"], ["井ノ原快彦", "20th Century"], ["増田貴久", "NEWS"], ["小山慶一郎", "NEWS"], ["加藤シゲアキ", "NEWS"], ["横山裕", "SUPER EIGHT"], ["村上信五", "SUPER EIGHT"], ["丸山隆平", "SUPER EIGHT"], ["安田章大", "SUPER EIGHT"], ["大倉忠義", "SUPER EIGHT"], ["山田涼介", "Hey! Say! JUMP"], ["知念侑李", "Hey! Say! JUMP"], ["有岡大貴", "Hey! Say! JUMP"], ["伊野尾慧", "Hey! Say! JUMP"], ["八乙女光", "Hey! Say! JUMP"], ["薮宏太", "Hey! Say! JUMP"], ["髙木雄也", "Hey! Say! JUMP"], ["千賀健永", "Kis-My-Ft2"], ["宮田俊哉", "Kis-My-Ft2"], ["横尾渉", "Kis-My-Ft2"], ["藤ヶ谷太輔", "Kis-My-Ft2"], ["玉森裕太", "Kis-My-Ft2"], ["二階堂高嗣", "Kis-My-Ft2"], ["佐藤勝利", "timelesz"], ["菊池風磨", "timelesz"], ["松島聡", "timelesz"], ["寺西拓人", "timelesz"], ["原嘉孝", "timelesz"], ["橋本将生", "timelesz"], ["猪俣周杜", "timelesz"], ["篠塚大輝", "timelesz"], ["橋本良亮", "A.B.C-Z"], ["戸塚祥太", "A.B.C-Z"], ["五関晃一", "A.B.C-Z"], ["塚田僚一", "A.B.C-Z"], ["重岡大毅", "WEST."], ["桐山照史", "WEST."], ["中間淳太", "WEST."], ["神山智洋", "WEST."], ["藤井流星", "WEST."], ["濵田崇裕", "WEST."], ["小瀧望", "WEST."], ["髙地優吾", "SixTONES"], ["京本大我", "SixTONES"], ["田中樹", "SixTONES"], ["松村北斗", "SixTONES"], ["ジェシー", "SixTONES"], ["森本慎太郎", "SixTONES"], ["岩本照", "Snow Man"], ["深澤辰哉", "Snow Man"], ["渡辺翔太", "Snow Man"], ["阿部亮平", "Snow Man"], ["佐久間大介", "Snow Man"], ["宮舘涼太", "Snow Man"], ["向井康二", "Snow Man"], ["目黒蓮", "Snow Man"], ["ラウール", "Snow Man"], ["藤原丈一郎", "なにわ男子"], ["西畑大吾", "なにわ男子"], ["大西流星", "なにわ男子"], ["道枝駿佑", "なにわ男子"], ["高橋恭平", "なにわ男子"], ["長尾謙杜", "なにわ男子"], ["大橋和也", "なにわ男子"], ["宮近海斗", "Travis Japan"], ["中村海人", "Travis Japan"], ["七五三掛龍也", "Travis Japan"], ["川島如恵留", "Travis Japan"], ["吉澤閑也", "Travis Japan"], ["松田元太", "Travis Japan"], ["松倉海斗", "Travis Japan"], ["正門良規", "Aぇ! group"], ["末澤誠也", "Aぇ! group"], ["小島健", "Aぇ! group"], ["佐野晶哉", "Aぇ! group"], ["永瀬廉", "King & Prince"], ["髙橋海人", "King & Prince"]];
-const MAX_ROUNDS=35;
-let scores=[];
-let leftIndex=0;
-let rightIndex=1;
-let round=0;
-let locked=false;
+const TOTAL=members.length;
+const MIN_SEEN=2;
+const scores=new Array(TOTAL).fill(0);
+const seen=new Array(TOTAL).fill(0);
+const history=[];
+let a=-1,b=-1,locked=false;
+let phase="coverage";
 
-function resetScores(){
-  scores=new Array(members.length).fill(0);
+function shuffle(arr){
+  return arr.slice().sort(()=>Math.random()-0.5);
 }
-function randomPair(){
-  leftIndex=Math.floor(Math.random()*members.length);
-  do{rightIndex=Math.floor(Math.random()*members.length);}while(rightIndex===leftIndex);
+
+function pairKey(x,y){
+  return x<y ? x+"-"+y : y+"-"+x;
 }
-function drawPerson(id,index){
-  const el=document.getElementById(id);
-  const person=members[index];
-  el.innerHTML=
-    '<div class="avatar">'+person[0].charAt(0)+'</div>'+
-    '<div class="name">'+person[0]+'</div>'+
-    '<div class="group">'+person[1]+'</div>'+
-    '<div class="tap">タップして選ぶ</div>';
+
+function neverPaired(x,y){
+  return !history.includes(pairKey(x,y));
 }
-function render(){
-  drawPerson("left",leftIndex);
-  drawPerson("right",rightIndex);
-  document.getElementById("counter").textContent=(round+1)+" / "+MAX_ROUNDS+" 回";
-  document.getElementById("bar").style.width=((round/MAX_ROUNDS)*100)+"%";
+
+function coveragePair(){
+  // Prefer people who have appeared fewer than MIN_SEEN times.
+  const candidates=[];
+  for(let i=0;i<TOTAL;i++) if(seen[i]<MIN_SEEN) candidates.push(i);
+  let list=shuffle(candidates);
+  let x=list[0], y=null;
+  for(let i=1;i<list.length;i++){
+    if(list[i]!==x && neverPaired(x,list[i])){ y=list[i]; break; }
+  }
+  if(y===null){
+    y=list.find(i=>i!==x) ?? ((x+1)%TOTAL);
+  }
+  return [x,y];
 }
+
+function competitivePair(){
+  // Focus on strong candidates while still giving under-seen people a chance.
+  const ranked=Array.from({length:TOTAL},(_,i)=>i).sort((x,y)=>{
+    const sx=scores[x]+Math.min(seen[x],4)*0.2;
+    const sy=scores[y]+Math.min(seen[y],4)*0.2;
+    return sy-sx;
+  });
+  const top=ranked.slice(0,Math.min(24,TOTAL));
+  let x=top[Math.floor(Math.random()*top.length)];
+  let y=top[Math.floor(Math.random()*top.length)];
+  let tries=0;
+  while((x===y || !neverPaired(x,y)) && tries<50){
+    y=top[Math.floor(Math.random()*top.length)];
+    tries++;
+  }
+  if(x===y) y=(x+1)%TOTAL;
+  return [x,y];
+}
+
 function nextPair(){
-  if(round>=MAX_ROUNDS){showResult();return;}
-  randomPair();
-  render();
+  const pair=phase==="coverage" ? coveragePair() : competitivePair();
+  a=pair[0]; b=pair[1];
+  seen[a]++; seen[b]++;
+  history.push(pairKey(a,b));
+  draw();
   locked=false;
 }
+
+function drawPerson(id,i){
+  const p=members[i];
+  document.getElementById(id).innerHTML=
+    '<div class="avatar">'+p[0].charAt(0)+'</div>'+
+    '<div class="name">'+p[0]+'</div>'+
+    '<div class="group">'+p[1]+'</div>'+
+    '<div class="tap">タップして選ぶ</div>';
+}
+
+function draw(){
+  drawPerson("left",a);
+  drawPerson("right",b);
+  const checked=seen.filter(x=>x>=MIN_SEEN).length;
+  const covered=seen.filter(x=>x>0).length;
+  if(phase==="coverage"){
+    document.getElementById("counter").textContent=
+      "全員チェック中　"+covered+" / "+TOTAL+"人";
+    document.querySelector(".lead").textContent=
+      "まずは全員を2回ずつ比較していくよ♡";
+    document.getElementById("bar").style.width=(checked/TOTAL*60)+"%";
+  }else{
+    document.getElementById("counter").textContent=
+      "上位候補を比較中　"+checked+" / "+TOTAL+"人";
+    document.querySelector(".lead").textContent=
+      "ここからは上位候補をじっくり比較♡";
+    document.getElementById("bar").style.width=Math.min(95,60+history.length/2)+"%";
+  }
+}
+
 function vote(type){
   if(locked)return;
   locked=true;
-  if(type==="left")scores[leftIndex]+=2;
-  else if(type==="right")scores[rightIndex]+=2;
-  else if(type==="both"){scores[leftIndex]+=1;scores[rightIndex]+=1;}
-  round++;
-  if(round>=MAX_ROUNDS)showResult();
-  else nextPair();
+  if(type==="left") scores[a]+=3;
+  if(type==="right") scores[b]+=3;
+  if(type==="both"){ scores[a]+=2; scores[b]+=2; }
+  // "none" gives neither person a boost.
+
+  const allCovered=seen.every(x=>x>=MIN_SEEN);
+  if(allCovered && phase==="coverage"){
+    phase="competitive";
+  }
+
+  // Finish once coverage is complete and there has been enough
+  // competitive comparison to stabilize the top 9.
+  if(phase==="competitive" && history.length>=140){
+    showResult();
+  }else{
+    nextPair();
+  }
 }
+
 function showResult(){
   document.getElementById("game").style.display="none";
   document.getElementById("result").style.display="block";
-  const result=members.map((m,i)=>({name:m[0],group:m[1],score:scores[i],index:i}))
-    .sort((a,b)=>b.score-a.score);
-  const medals=["🥇","🥈","🥉"];
-  document.getElementById("ranking").innerHTML=result.slice(0,9).map(function(x,i){
+
+  const result=members.map((m,i)=>({
+    name:m[0],group:m[1],score:scores[i],seen:seen[i]
+  })).sort((x,y)=>y.score-x.score);
+
+  document.getElementById("ranking").innerHTML=result.slice(0,9).map((x,i)=>{
+    const medal=["🥇","🥈","🥉"][i] || (i+1);
     return '<div class="rank">'+
-      '<div class="place">'+(medals[i]||String(i+1))+'</div>'+
-      '<div><div class="rankname">'+x.name+'</div><div class="ranksub">'+x.group+'</div></div>'+
+      '<div class="place">'+medal+'</div>'+
+      '<div><div class="rankname">'+x.name+'</div>'+
+      '<div class="ranksub">'+x.group+'</div></div>'+
       '<div class="points">'+x.score+' pt</div>'+
       '</div>';
   }).join("");
 }
-function start(){
-  resetScores();
-  round=0;
-  locked=false;
-  document.getElementById("game").style.display="block";
-  document.getElementById("result").style.display="none";
-  nextPair();
-}
-document.getElementById("leftBtn").addEventListener("click",function(){vote("left");});
-document.getElementById("rightBtn").addEventListener("click",function(){vote("right");});
-document.getElementById("bothBtn").addEventListener("click",function(){vote("both");});
-document.getElementById("noneBtn").addEventListener("click",function(){vote("none");});
-document.getElementById("left").addEventListener("click",function(){vote("left");});
-document.getElementById("right").addEventListener("click",function(){vote("right");});
-document.getElementById("restart").addEventListener("click",start);
-start();
+
+document.getElementById("leftBtn").onclick=()=>vote("left");
+document.getElementById("rightBtn").onclick=()=>vote("right");
+document.getElementById("bothBtn").onclick=()=>vote("both");
+document.getElementById("noneBtn").onclick=()=>vote("none");
+document.getElementById("left").onclick=()=>vote("left");
+document.getElementById("right").onclick=()=>vote("right");
+document.getElementById("restart").onclick=()=>location.reload();
+nextPair();
 })();
 </script>
 </body>
