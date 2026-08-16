@@ -44,6 +44,145 @@ h1 span{color:#d46fa8}
  .name{font-size:17px}
  .choice{font-size:12px;min-height:55px}
 }
+
+/* ===== Cute TOP 9 result screen ===== */
+#result {
+  padding-bottom: 20px;
+}
+.result-title {
+  text-align: center;
+  margin: 4px 0 20px;
+}
+.result-title .eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #c6659c;
+  font-weight: 900;
+  margin-bottom: 7px;
+}
+.result-title h1 {
+  margin: 0;
+  font-size: 35px;
+  line-height: 1.08;
+}
+.result-title h1 span {
+  color: #d46fa8;
+}
+.result-title .sub {
+  margin: 10px 0 0;
+  color: #999;
+  font-size: 12px;
+}
+.top9 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.result-card {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255,255,255,.94);
+  border-radius: 22px;
+  padding: 16px 9px 18px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(100,60,90,.10);
+  border: 1px solid rgba(255,255,255,.9);
+}
+.result-card::before {
+  content: "";
+  position: absolute;
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  background: #fff0f7;
+  top: -38px;
+  right: -25px;
+}
+.result-card .rank-number {
+  position: relative;
+  font-size: 11px;
+  color: #c6659c;
+  font-weight: 900;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.result-card .rank-avatar {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 9px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #fae5f1;
+  color: #c45d98;
+  font-size: 23px;
+  font-weight: 900;
+}
+.result-card .result-name {
+  position: relative;
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1.25;
+  word-break: keep-all;
+}
+.result-card .result-group {
+  position: relative;
+  margin-top: 5px;
+  color: #999;
+  font-size: 10px;
+}
+.result-card .score {
+  position: relative;
+  margin-top: 8px;
+  font-size: 10px;
+  color: #c6659c;
+  font-weight: 800;
+}
+
+/* Top 3 */
+.result-card.rank-1,
+.result-card.rank-2,
+.result-card.rank-3 {
+  grid-column: span 2;
+  padding: 20px 16px 22px;
+}
+.result-card.rank-1 {
+  background: linear-gradient(145deg,#fff,#fff0f7);
+  box-shadow: 0 12px 30px rgba(196,93,152,.16);
+}
+.result-card.rank-1 .rank-avatar {
+  width: 72px;
+  height: 72px;
+  font-size: 29px;
+  background: #f8dce9;
+}
+.result-card.rank-1 .result-name {
+  font-size: 20px;
+}
+.result-card.rank-2 .rank-avatar,
+.result-card.rank-3 .rank-avatar {
+  width: 64px;
+  height: 64px;
+  font-size: 25px;
+}
+
+.result-actions {
+  text-align: center;
+  margin-top: 18px;
+}
+.restart.pretty {
+  min-width: 190px;
+  box-shadow: 0 8px 20px rgba(64,57,71,.14);
+}
+@media(max-width:390px) {
+  .result-title h1 { font-size: 31px; }
+  .result-card { border-radius: 19px; }
+  .result-card .result-name { font-size: 15px; }
+  .result-card.rank-1 .result-name { font-size: 19px; }
+}
+
 </style>
 </head>
 <body>
@@ -69,13 +208,15 @@ h1 span{color:#d46fa8}
 </section>
 
 <section id="result">
-<div class="header">
-<span class="badge">RESULT</span>
-<h1>あなたの<br><span>好き顔ランキング</span> ♡</h1>
-<p class="lead">全員をしっかり比較した、あなたの好き顔TOP9♡</p>
-</div>
-<div id="ranking" class="ranking"></div>
-<button id="restart" class="restart" type="button">もう一回あそぶ ♡</button>
+  <div class="result-title">
+    <div class="eyebrow">♡ YOUR RESULT ♡</div>
+    <h1>あなたの<br><span>好き顔 TOP 9</span></h1>
+    <p class="sub">全員をしっかり比較した、あなたの好き顔ランキング♡</p>
+  </div>
+  <div id="ranking" class="top9"></div>
+  <div class="result-actions">
+    <button id="restart" class="restart pretty" type="button">もう一度診断する ♡</button>
+  </div>
 </section>
 </main>
 
@@ -206,12 +347,13 @@ function showResult(){
   })).sort((x,y)=>y.score-x.score);
 
   document.getElementById("ranking").innerHTML=result.slice(0,9).map((x,i)=>{
-    const medal=["🥇","🥈","🥉"][i] || (i+1);
-    return '<div class="rank">'+
-      '<div class="place">'+medal+'</div>'+
-      '<div><div class="rankname">'+x.name+'</div>'+
-      '<div class="ranksub">'+x.group+'</div></div>'+
-      '<div class="points">'+x.score+' pt</div>'+
+    const medal=["🥇","🥈","🥉"][i] || "♡";
+    return '<div class="result-card rank-'+(i+1)+'">'+
+      '<div class="rank-number">'+medal+' '+(i+1)+'位</div>'+
+      '<div class="rank-avatar">'+x.name.charAt(0)+'</div>'+
+      '<div class="result-name">'+x.name+'</div>'+
+      '<div class="result-group">'+x.group+'</div>'+
+      '<div class="score">'+x.score+' pt ・ '+x.seen+'回比較</div>'+
       '</div>';
   }).join("");
 }
