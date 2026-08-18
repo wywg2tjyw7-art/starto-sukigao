@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>STARTO 好き顔♡9選</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;width:100%;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;color:#403947}
+body{background:linear-gradient(145deg,#fff6fb 0%,#f4f0ff 100%);}
+button{font:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.app{width:100%;max-width:700px;margin:auto;padding:18px 14px 40px}
+.header{text-align:center;padding:12px 0 10px}
+.badge{display:inline-block;background:#fff;border-radius:999px;padding:6px 12px;color:#c6659c;font-size:11px;font-weight:800;box-shadow:0 3px 12px #0001}
+h1{font-size:36px;line-height:1.05;margin:14px 0 8px}
+h1 span{color:#d46fa8}
+.lead{font-size:13px;color:#777;margin:0}
+.progress{height:7px;background:#fff8;border-radius:99px;overflow:hidden;margin:10px 0 6px}
+.bar{height:100%;width:0;background:#d88ab7;transition:width .2s}
+.counter{text-align:center;color:#999;font-size:12px;margin:0 0 10px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.person{border:0;background:#fff;border-radius:22px;min-height:225px;padding:20px 8px;box-shadow:0 8px 26px #00000012;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer}
+.person:active{transform:scale(.98)}
+.avatar{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:#fae5f1;color:#c45d98;font-size:26px;font-weight:900;margin-bottom:14px}
+.name{font-size:19px;font-weight:900;text-align:center;line-height:1.25;word-break:keep-all}
+.group{font-size:11px;color:#999;margin-top:8px;text-align:center}
+.tap{font-size:10px;color:#c58baa;margin-top:10px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.choice{border:0;background:#fff;border-radius:15px;min-height:58px;padding:10px 5px;font-size:13px;font-weight:800;color:#4d4650;box-shadow:0 5px 16px #0000000c;cursor:pointer}
+.choice:active{transform:scale(.98);background:#fff0f7}
+#result{display:none;text-align:center}
+.ranking{text-align:left;margin-top:18px}
+.rank{display:flex;align-items:center;gap:10px;background:#fff;border-radius:15px;padding:12px 14px;margin:7px 0;box-shadow:0 4px 15px #0000000b}
+.place{width:30px;text-align:center;font-weight:900}
+.rankname{font-weight:800}
+.ranksub{font-size:10px;color:#999}
+.points{margin-left:auto;color:#c6659c;font-size:11px}
+.restart{border:0;background:#403947;color:#fff;border-radius:999px;padding:14px 24px;font-weight:900;margin-top:16px;cursor:pointer}
+@media(max-width:390px){
+ .app{padding:12px 9px 30px}
+ h1{font-size:31px}
+ .person{min-height:195px}
+ .avatar{width:55px;height:55px;font-size:22px}
+ .name{font-size:17px}
+ .choice{font-size:12px;min-height:55px}
+}
+
+/* ===== Cute TOP 9 result screen ===== */
+#result {
+  padding-bottom: 20px;
+}
+.result-title {
+  text-align: center;
+  margin: 4px 0 20px;
+}
+.result-title .eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #c6659c;
+  font-weight: 900;
+  margin-bottom: 7px;
+}
+.result-title h1 {
+  margin: 0;
+  font-size: 35px;
+  line-height: 1.08;
+}
+.result-title h1 span {
+  color: #d46fa8;
+}
+.result-title .sub {
+  margin: 10px 0 0;
+  color: #999;
+  font-size: 12px;
+}
+.top9 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.result-card {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255,255,255,.94);
+  border-radius: 22px;
+  padding: 16px 9px 18px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(100,60,90,.10);
+  border: 1px solid rgba(255,255,255,.9);
+}
+.result-card::before {
+  content: "";
+  position: absolute;
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  background: #fff0f7;
+  top: -38px;
+  right: -25px;
+}
+.result-card .rank-number {
+  position: relative;
+  font-size: 11px;
+  color: #c6659c;
+  font-weight: 900;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.result-card .rank-avatar {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 9px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #fae5f1;
+  color: #c45d98;
+  font-size: 23px;
+  font-weight: 900;
+}
+.result-card .result-name {
+  position: relative;
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1.25;
+  word-break: keep-all;
+}
+.result-card .result-group {
+  position: relative;
+  margin-top: 5px;
+  color: #999;
+  font-size: 10px;
+}
+.result-card .score {
+  position: relative;
+  margin-top: 8px;
+  font-size: 10px;
+  color: #c6659c;
+  font-weight: 800;
+}
+
+/* Top 3 */
+.result-card.rank-1,
+.result-card.rank-2,
+.result-card.rank-3 {
+  grid-column: span 2;
+  padding: 20px 16px 22px;
+}
+.result-card.rank-1 {
+  background: linear-gradient(145deg,#fff,#fff0f7);
+  box-shadow: 0 12px 30px rgba(196,93,152,.16);
+}
+.result-card.rank-1 .rank-avatar {
+  width: 72px;
+  height: 72px;
+  font-size: 29px;
+  background: #f8dce9;
+}
+.result-card.rank-1 .result-name {
+  font-size: 20px;
+}
+.result-card.rank-2 .rank-avatar,
+.result-card.rank-3 .rank-avatar {
+  width: 64px;
+  height: 64px;
+  font-size: 25px;
+}
+
+.result-actions {
+  text-align: center;
+  margin-top: 18px;
+}
+.restart.pretty {
+  min-width: 190px;
+  box-shadow: 0 8px 20px rgba(64,57,71,.14);
+}
+@media(max-width:390px) {
+  .result-title h1 { font-size: 31px; }
+  .result-card { border-radius: 19px; }
+  .result-card .result-name { font-size: 15px; }
+  .result-card.rank-1 .result-name { font-size: 19px; }
+}
+
+
+.back-wrap {
+  text-align: center;
+  margin: 10px 0 8px;
+}
+#backBtn {
+  border: 0;
+  background: rgba(255,255,255,.72);
+  color: #b75b91;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 9px 15px;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(100,60,90,.08);
+}
+#backBtn:disabled {
+  opacity: .35;
+}
+
+</style>
+</head>
+<body>
+<main class="app">
+<section id="game">
+<div class="header">
+<span class="badge">STARTO ENTERTAINMENT</span>
+<h1>好き顔<span>♡</span>9選</h1>
+<p class="lead">デビュー組全員を比較して、あなたの好き顔TOP9を決めよう！</p>
+</div>
+<div class="progress"><div id="bar" class="bar"></div></div>
+<p id="counter" class="counter">1 / 35 回</p>
+<div class="pair">
+<button id="left" class="person" type="button"></button>
+<button id="right" class="person" type="button"></button>
+</div>
+<div class="choices">
+<button id="leftBtn" class="choice" type="button">← 左の人が好き</button>
+<button id="rightBtn" class="choice" type="button">右の人が好き →</button>
+<button id="bothBtn" class="choice" type="button">♡ どっちも好き</button>
+<button id="noneBtn" class="choice" type="button">△ どっちもタイプじゃない</button>
+<div class="back-wrap"><button id="backBtn" type="button">← 1つ前に戻る</button></div>
+
+</div>
+</section>
+
+<section id="result">
+  <div class="result-title">
+    <div class="eyebrow">♡ YOUR RESULT ♡</div>
+    <h1>あなたの<br><span>好き顔 TOP 9</span></h1>
+    <p class="sub">全員をしっかり比較した、あなたの好き顔ランキング♡</p>
+  </div>
+  <div id="ranking" class="top9"></div>
+  <div class="result-actions">
+    <button id="restart" class="restart pretty" type="button">もう一度診断する ♡</button>
+  </div>
+</section>
+</main>
+
+<script>
+(function(){
+"use strict";
+const members=[["坂本昌行", "20th Century"], ["長野博", "20th Century"], ["井ノ原快彦", "20th Century"], ["増田貴久", "NEWS"], ["小山慶一郎", "NEWS"], ["加藤シゲアキ", "NEWS"], ["横山裕", "SUPER EIGHT"], ["村上信五", "SUPER EIGHT"], ["丸山隆平", "SUPER EIGHT"], ["安田章大", "SUPER EIGHT"], ["大倉忠義", "SUPER EIGHT"], ["山田涼介", "Hey! Say! JUMP"], ["知念侑李", "Hey! Say! JUMP"], ["有岡大貴", "Hey! Say! JUMP"], ["伊野尾慧", "Hey! Say! JUMP"], ["八乙女光", "Hey! Say! JUMP"], ["薮宏太", "Hey! Say! JUMP"], ["髙木雄也", "Hey! Say! JUMP"], ["千賀健永", "Kis-My-Ft2"], ["宮田俊哉", "Kis-My-Ft2"], ["横尾渉", "Kis-My-Ft2"], ["藤ヶ谷太輔", "Kis-My-Ft2"], ["玉森裕太", "Kis-My-Ft2"], ["二階堂高嗣", "Kis-My-Ft2"], ["佐藤勝利", "timelesz"], ["菊池風磨", "timelesz"], ["松島聡", "timelesz"], ["寺西拓人", "timelesz"], ["原嘉孝", "timelesz"], ["橋本将生", "timelesz"], ["猪俣周杜", "timelesz"], ["篠塚大輝", "timelesz"], ["橋本良亮", "A.B.C-Z"], ["戸塚祥太", "A.B.C-Z"], ["五関晃一", "A.B.C-Z"], ["塚田僚一", "A.B.C-Z"], ["重岡大毅", "WEST."], ["桐山照史", "WEST."], ["中間淳太", "WEST."], ["神山智洋", "WEST."], ["藤井流星", "WEST."], ["濵田崇裕", "WEST."], ["小瀧望", "WEST."], ["髙地優吾", "SixTONES"], ["京本大我", "SixTONES"], ["田中樹", "SixTONES"], ["松村北斗", "SixTONES"], ["ジェシー", "SixTONES"], ["森本慎太郎", "SixTONES"], ["岩本照", "Snow Man"], ["深澤辰哉", "Snow Man"], ["渡辺翔太", "Snow Man"], ["阿部亮平", "Snow Man"], ["佐久間大介", "Snow Man"], ["宮舘涼太", "Snow Man"], ["向井康二", "Snow Man"], ["目黒蓮", "Snow Man"], ["ラウール", "Snow Man"], ["藤原丈一郎", "なにわ男子"], ["西畑大吾", "なにわ男子"], ["大西流星", "なにわ男子"], ["道枝駿佑", "なにわ男子"], ["高橋恭平", "なにわ男子"], ["長尾謙杜", "なにわ男子"], ["大橋和也", "なにわ男子"], ["宮近海斗", "Travis Japan"], ["中村海人", "Travis Japan"], ["七五三掛龍也", "Travis Japan"], ["川島如恵留", "Travis Japan"], ["吉澤閑也", "Travis Japan"], ["松田元太", "Travis Japan"], ["松倉海斗", "Travis Japan"], ["正門良規", "Aぇ! group"], ["末澤誠也", "Aぇ! group"], ["小島健", "Aぇ! group"], ["佐野晶哉", "Aぇ! group"], ["永瀬廉", "King & Prince"], ["髙橋海人", "King & Prince"], ["岩﨑大昇", "KEY TO LIT"], ["井上瑞稀", "KEY TO LIT"], ["中村嶺亜", "KEY TO LIT"], ["猪狩蒼弥", "KEY TO LIT"], ["佐々木大光", "KEY TO LIT"]];
+const TOTAL=members.length;
+const MIN_SEEN=2;
+let scores=new Array(TOTAL).fill(0);
+let seen=new Array(TOTAL).fill(0);
+let history=[];
+let a=-1,b=-1,locked=false;
+let phase="coverage";
+let snapshots=[];
+
+function shuffle(arr){
+  return arr.slice().sort(()=>Math.random()-0.5);
+}
+
+function pairKey(x,y){
+  return x<y ? x+"-"+y : y+"-"+x;
+}
+
+function neverPaired(x,y){
+  return !history.includes(pairKey(x,y));
+}
+
+function coveragePair(){
+  // Prefer people who have appeared fewer than MIN_SEEN times.
+  const candidates=[];
+  for(let i=0;i<TOTAL;i++) if(seen[i]<MIN_SEEN) candidates.push(i);
+  let list=shuffle(candidates);
+  let x=list[0], y=null;
+  for(let i=1;i<list.length;i++){
+    if(list[i]!==x && neverPaired(x,list[i])){ y=list[i]; break; }
+  }
+  if(y===null){
+    y=list.find(i=>i!==x) ?? ((x+1)%TOTAL);
+  }
+  return [x,y];
+}
+
+function competitivePair(){
+  // Focus on strong candidates while still giving under-seen people a chance.
+  const ranked=Array.from({length:TOTAL},(_,i)=>i).sort((x,y)=>{
+    const sx=scores[x]+Math.min(seen[x],4)*0.2;
+    const sy=scores[y]+Math.min(seen[y],4)*0.2;
+    return sy-sx;
+  });
+  const top=ranked.slice(0,Math.min(24,TOTAL));
+  let x=top[Math.floor(Math.random()*top.length)];
+  let y=top[Math.floor(Math.random()*top.length)];
+  let tries=0;
+  while((x===y || !neverPaired(x,y)) && tries<50){
+    y=top[Math.floor(Math.random()*top.length)];
+    tries++;
+  }
+  if(x===y) y=(x+1)%TOTAL;
+  return [x,y];
+}
+
+function saveSnapshot(){
+  snapshots.push({
+    scores:scores.slice(),
+    seen:seen.slice(),
+    history:history.slice(),
+    phase:phase,
+    a:a,b:b
+  });
+}
+
+function updateBackButton(){
+  const btn=document.getElementById("backBtn");
+  if(btn) btn.disabled=snapshots.length===0;
+}
+
+function nextPair(){
+  const pair=phase==="coverage" ? coveragePair() : competitivePair();
+  a=pair[0]; b=pair[1];
+  seen[a]++; seen[b]++;
+  history.push(pairKey(a,b));
+  draw();
+  locked=false;
+}
+
+function drawPerson(id,i){
+  const p=members[i];
+  document.getElementById(id).innerHTML=
+    '<div class="avatar">'+p[0].charAt(0)+'</div>'+
+    '<div class="name">'+p[0]+'</div>'+
+    '<div class="group">'+p[1]+'</div>'+
+    '<div class="tap">タップして選ぶ</div>';
+}
+
+function draw(){
+  drawPerson("left",a);
+  drawPerson("right",b);
+  const checked=seen.filter(x=>x>=MIN_SEEN).length;
+  const covered=seen.filter(x=>x>0).length;
+  if(phase==="coverage"){
+    document.getElementById("counter").textContent=
+      "全員チェック中　"+covered+" / "+TOTAL+"人";
+    document.querySelector(".lead").textContent=
+      "まずは全員を2回ずつ比較していくよ♡";
+    document.getElementById("bar").style.width=(checked/TOTAL*60)+"%";
+  }else{
+    document.getElementById("counter").textContent=
+      "上位候補を比較中　"+checked+" / "+TOTAL+"人";
+    document.querySelector(".lead").textContent=
+      "ここからは上位候補をじっくり比較♡";
+    document.getElementById("bar").style.width=Math.min(95,60+history.length/2)+"%";
+  }
+
+  updateBackButton();
+}
+
+function vote(type){
+  if(locked)return;
+
+  // Save the current question and score state so it can be undone.
+  snapshots.push({
+    scores:scores.slice(),
+    seen:seen.slice(),
+    history:history.slice(),
+    phase:phase,
+    a:a,b:b
+  });
+
+  locked=true;
+  if(type==="left") scores[a]+=3;
+  if(type==="right") scores[b]+=3;
+  if(type==="both"){ scores[a]+=2; scores[b]+=2; }
+
+  const allCovered=seen.every(x=>x>=MIN_SEEN);
+  if(allCovered && phase==="coverage") phase="competitive";
+
+  if(phase==="competitive" && history.length>=140){
+    showResult();
+  }else{
+    nextPair();
+  }
+}
+
+function goBack(){
+  if(snapshots.length===0)return;
+  const s=snapshots.pop();
+  scores=s.scores;
+  seen=s.seen;
+  history=s.history;
+  phase=s.phase;
+  a=s.a; b=s.b;
+  locked=false;
+  document.getElementById("game").style.display="block";
+  document.getElementById("result").style.display="none";
+  draw();
+  updateBackButton();
+}
+
+function showResult(){
+  document.getElementById("game").style.display="none";
+  document.getElementById("result").style.display="block";
+
+  const result=members.map((m,i)=>({
+    name:m[0],group:m[1],score:scores[i],seen:seen[i]
+  })).sort((x,y)=>y.score-x.score);
+
+  document.getElementById("ranking").innerHTML=result.slice(0,9).map((x,i)=>{
+    const medal=["🥇","🥈","🥉"][i] || "♡";
+    return '<div class="result-card rank-'+(i+1)+'">'+
+      '<div class="rank-number">'+medal+' '+(i+1)+'位</div>'+
+      '<div class="rank-avatar">'+x.name.charAt(0)+'</div>'+
+      '<div class="result-name">'+x.name+'</div>'+
+      '<div class="result-group">'+x.group+'</div>'+
+      '<div class="score">'+x.score+' pt ・ '+x.seen+'回比較</div>'+
+      '</div>';
+  }).join("");
+}
+
+document.getElementById("leftBtn").onclick=()=>vote("left");
+document.getElementById("rightBtn").onclick=()=>vote("right");
+document.getElementById("bothBtn").onclick=()=>vote("both");
+document.getElementById("noneBtn").onclick=()=>vote("none");
+document.getElementById("left").onclick=()=>vote("left");
+document.getElementById("right").onclick=()=>vote("right");
+document.getElementById("restart").onclick=()=>location.reload();
+document.getElementById("backBtn").onclick=goBack;
+nextPair();
+updateBackButton();
+})();
+</script>
+</body>
+</html>
